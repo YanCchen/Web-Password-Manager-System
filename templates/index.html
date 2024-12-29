@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YanX</title>
+    <link rel="icon" href="https://q.qlogo.cn/headimg_dl?dst_uin=43891963&spec=640&img_type=png" sizes="192x192" />
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #2A2A72;
+            --background-color: #F8F9FA;
+            --card-background: #FFFFFF;
+            --text-color: #2C3E50;
+            --shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        body { 
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 40px 20px;
+            transition: all 0.3s ease;
+            background-color: var(--background-color);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .header.sticky {
+            padding: 15px 20px;
+            background-color: rgba(248, 249, 250, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .search-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .search-wrapper {
+            position: relative;
+            margin: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 25px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            background: var(--card-background);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .search-input::placeholder {
+            color: #adb5bd;
+            text-align: center;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            font-weight: normal;
+            font-size: 1.1rem;
+        }
+
+        .search-input:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 30px rgba(108, 99, 255, 0.2);
+            text-align: center;
+            transform: translateY(-2px);
+        }
+
+        .search-input:focus::placeholder {
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .item { 
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+        }
+
+        .item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+            border-radius: 20px;
+        }
+
+        .item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .item h2 { 
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin: 0 0 15px 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+            padding-bottom: 10px;
+        }
+
+        .item h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-color);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .item p { 
+            color: var(--text-color);
+            margin: 0;
+            line-height: 1.6;
+            opacity: 0.8;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .item:hover { 
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(108, 99, 255, 0.25);
+        }
+
+        .item:hover::before {
+            opacity: 1;
+        }
+
+        .item:hover h2 {
+            color: white;
+        }
+
+        .item:hover h2::after {
+            width: 100%;
+            background: white;
+        }
+
+        .item:hover p {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .item:active {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(108, 99, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .item:active::before {
+            opacity: 0.9;
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOutDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        }
+
+        .item.hidden {
+            animation: fadeOutDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .item.visible {
+            animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* 移除所有可能导致闪烁的动画 */
+        .item {
+            animation: none !important;
+        }
+
+        .item:hover {
+            animation: none !important;
+        }
+
+        .item h2,
+        .item p {
+            animation: none !important;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes headerFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px 0;
+                width: 100%;
+            }
+
+            .header.sticky {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                padding: 10px 0;
+                animation: headerFadeIn 0.3s ease;
+            }
+
+            .search-wrapper {
+                margin: 0 15px;
+                width: auto;
+            }
+
+            .search-input {
+                padding: 12px 20px;
+                font-size: 1rem;
+                border-radius: 10px;
+                width: 100%;
+            }
+
+            .container {
+                margin-top: 20px;
+                grid-template-columns: 1fr;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            body.sticky-active {
+                padding-top: 65px;
+            }
+        }
+
+        .item:active {
+            background-color: var(--primary-color);
+            border-radius: 20px;
+            transform: scale(0.98);
+            transition: all 0.2s ease;
+        }
+
+        .item:active h2 {
+            color: white;
+        }
+
+        .item:active p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        input {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        /* 表单相关样式 */
+        .form-actions {
+            margin: 20px 0;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        #formFields {
+            padding: 0 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:first-child {
+            margin-bottom: 30px;
+            background: white;
+            padding: 0;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0 15px;
+        }
+
+        .field-group {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            transform-origin: top center;
+            height: 66px;
+            opacity: 1;
+            overflow: hidden;
+            transform: translateY(0);
+        }
+
+        .field-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .field-group input {
+            height: 36px;
+            padding: 8px 12px;
+            border: 1.5px solid #eee;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: normal;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            width: 0;
+            flex: 1;
+            color: var(--text-color);
+        }
+
+        /* 名称输入框特殊样式 */
+        .form-group:first-child .field-group input {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .form-group:first-child .field-group input::placeholder {
+            font-weight: normal;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .form-group:first-child .field-group {
+            margin-bottom: 0;
+            animation: none;
+        }
+
+        .field-group input:hover,
+        .form-group:first-child input:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(108, 99, 255, 0.1);
+        }
+
+        .field-group input:focus,
+        .form-group:first-child input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .form-actions {
+            padding: 0 20px;
+            margin: 25px 0;
+        }
+
+        .form-actions .btn,
+        .modal-footer .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-actions .btn::after,
+        .modal-footer .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .form-actions .btn:hover::after,
+        .modal-footer .btn:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f1f3f5;
+            color: var(--text-color);
+        }
+
+        .form-actions .btn:hover,
+        .modal-footer .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .form-actions .btn:active,
+        .modal-footer .btn:active {
+            transform: translateY(1px);
+        }
+
+        .modal-footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 0 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f1f3f5;
+            color: var(--text-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-remove {
+            background: #ffebee;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            color: #f44336;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+        }
+
+        .btn-remove:hover {
+            background-color: #f44336;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .btn-remove svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: calc(100% - 40px);
+                padding: 20px;
+            }
+
+            #formFields,
+            .form-actions,
+            .modal-footer {
+                padding: 0 10px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+            }
+
+            .field-group input {
+                height: 34px;
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+
+            .form-group:first-child .field-group input {
+                font-size: 1rem;
+            }
+        }
+
+        /* 添加按钮样式 */
+        .add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+            box-shadow: 0 6px 25px rgba(108, 99, 255, 0.4);
+        }
+
+        .add-btn:active {
+            transform: scale(0.95);
+        }
+
+        .add-btn::before,
+        .add-btn::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .add-btn::before {
+            width: 24px;
+            height: 3px;
+        }
+
+        .add-btn::after {
+            width: 3px;
+            height: 24px;
+        }
+
+        .add-btn:hover::before,
+        .add-btn:hover::after {
+            transform: rotate(180deg);
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0);
+            -webkit-backdrop-filter: blur(0);
+            z-index: 1001;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 460px;
+            box-shadow: var(--shadow);
+            z-index: 1002;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal.show .modal-content {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: calc(100% - 30px);
+                padding: 20px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .add-btn {
+                z-index: 1000;
+            }
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 15px 30px rgba(108, 99, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 15px 30px rgba(108, 99, 255, 0.4);
+            }
+            100% {
+                box-shadow: 0 15px 30px rgba(108, 99, 255, 0.2);
+            }
+        }
+
+        .item:hover {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes textFloat {
+            0% {
+                transform: translateX(8px);
+            }
+            50% {
+                transform: translateX(12px);
+            }
+            100% {
+                transform: translateX(8px);
+            }
+        }
+
+        .item:hover h2,
+        .item:hover p {
+            animation: textFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 0 15px 30px rgba(108, 99, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 15px 30px rgba(108, 99, 255, 0.3);
+            }
+            100% {
+                box-shadow: 0 15px 30px rgba(108, 99, 255, 0.2);
+            }
+        }
+
+        .item:hover {
+            animation: glowPulse 2s infinite;
+        }
+
+        /* 添加新的动画关键帧 */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideOutUp {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+
+        /* 入场动画类 */
+        .field-group.entering {
+            height: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        /* 删除动画类 */
+        .field-group.removing {
+            margin: 0;
+            padding: 0;
+            height: 0 !important;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        #formFields {
+            padding: 0 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (max-width: 768px) {
+            .field-group {
+                height: 90px;  /* 减小高度 */
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .field-group input {
+                height: 32px;
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+
+            .btn-remove {
+                width: 26px;
+                height: 26px;
+                padding: 5px;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+                margin-bottom: 2px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+        }
+
+        /* 图片上传相关样式 */
+        .field-value-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            display: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            object-fit: cover;
+            order: 1;
+        }
+
+        .image-preview.visible {
+            display: block;
+        }
+
+        /* 上传按钮样式 */
+        .upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6c63ff 0%, #4c46b3 100%);
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateX(0);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-left: 10px;
+            order: 2; /* 确保按钮在图片后面 */
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
+        }
+
+        .upload-btn.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.8) translateX(20px);
+            margin-left: -46px;  /* 按钮宽度 + gap */
+            pointer-events: none;
+        }
+
+        .upload-btn svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-btn:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* 输入框样式 */
+        .field-value {
+            flex: 1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 0;
+            width: 100%;
+            order: 0; /* 确保输入框在最前面 */
+        }
+
+        .field-value.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px);
+            pointer-events: none;
+        }
+
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            display: none;
+            order: 1;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            object-fit: cover;
+        }
+
+        .image-preview.visible {
+            display: block;
+        }
+
+        /* 图片预览模态框样式 */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .preview-modal.show {
+            opacity: 1;
+        }
+
+        .preview-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90vh;
+        }
+
+        .preview-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .close-preview {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-preview:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .close-preview::before,
+        .close-preview::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: white;
+            border-radius: 1px;
+        }
+
+        .close-preview::before {
+            transform: rotate(45deg);
+        }
+
+        .close-preview::after {
+            transform: rotate(-45deg);
+        }
+
+        /* 手机端适配 */
+        @media (max-width: 768px) {
+            .field-value-wrapper {
+                flex-wrap: wrap;
+            }
+
+            .image-preview {
+                max-width: 80px;
+                max-height: 80px;
+            }
+
+            .upload-btn {
+                width: 32px;
+                height: 32px;
+            }
+
+            .upload-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        /* 清理按钮样式 */
+        .cleanup-btn {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .cleanup-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" 
+                       class="search-input" 
+                       placeholder="搜索..." 
+                       autocomplete="off">
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        {% for key, value in data.items() %}
+            <div class="item" 
+                 data-url="{{ url_for('data_detail', data_id=key) }}"
+                 data-id="{{ key }}"
+                 data-name="{{ value.名称 }}"
+                 data-content="{{ value.第一个数据 }}">
+                <h2>{{ value.名称 }}</h2>
+                {% if value.第一个数据 %}
+                    <p>{{ value.第一个数据 }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- 添加按钮 -->
+    <div class="add-btn" onclick="openModal()"></div>
+
+    <!-- 添加数据模态框 -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加数据</h2>
+            </div>
+            <div class="modal-body">
+                <form id="addForm" onsubmit="handleSubmit(event)">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div id="formFields">
+                        <div class="form-group">
+                            <label for="name">名称</label>
+                            <div class="field-group">
+                                <input type="text" id="name" name="名称" required autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="addField()">添加字段</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 观察者配置
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        // 统一的观察者处理函数
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // 状态管理相关代码
+        function saveState() {
+            const searchInput = document.querySelector('.search-input');
+            const state = {
+                searchText: searchInput.value,
+                scrollPosition: window.pageYOffset,
+                fromDetail: true  // 标记是情页相关的状态
+            };
+            localStorage.setItem('pageState', JSON.stringify(state));
+        }
+
+        async function restoreState() {
+            const stateStr = localStorage.getItem('pageState');
+            if (!stateStr) return;
+
+            try {
+                const state = JSON.parse(stateStr);
+                
+                // 只有从详情页返回时才恢复状态
+                if (state.fromDetail) {
+                    // 1. 恢复搜索状态
+                    if (state.searchText) {
+                        const searchInput = document.querySelector('.search-input');
+                        searchInput.value = state.searchText;
+                        await filterItems(state.searchText);
+                    }
+
+                    // 2. 恢复滚动位置
+                    if (typeof state.scrollPosition === 'number') {
+                        setTimeout(() => {
+                            window.scrollTo(0, state.scrollPosition);
+                        }, 100);
+                    }
+                    
+                    // 清除状态，避免影响后续刷新
+                    localStorage.removeItem('pageState');
+                }
+            } catch (error) {
+                console.error('恢复状态失败:', error);
+                localStorage.removeItem('pageState');
+            }
+        }
+
+        // 添加防抖函数
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // 搜索功能
+        async function filterItems(searchText) {
+            try {
+                // 处理搜索文本
+                const trimmedText = searchText.trim();
+                
+                // 如果搜索框为空，恢复到初始状态
+                if (!trimmedText) {
+                    const items = document.querySelectorAll('.item');
+                    items.forEach(item => {
+                        item.classList.remove('hidden');
+                        item.classList.remove('visible');
+                        requestAnimationFrame(() => {
+                            item.classList.add('visible');
+                        });
+                    });
+                    return;
+                }
+
+                // 发送搜索请求到后端
+                const response = await fetch(`/search?q=${encodeURIComponent(trimmedText)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const searchResults = await response.json();
+                
+                // 获取所有项
+                const items = document.querySelectorAll('.item');
+                
+                // 先隐藏所有项目
+                items.forEach(item => {
+                    item.classList.add('hidden');
+                    item.classList.remove('visible');
+                });
+                
+                // 显示匹配的项目
+                let delay = 0;
+                items.forEach(item => {
+                    const itemId = item.getAttribute('data-id');
+                    if (itemId && searchResults[itemId]) {
+                        setTimeout(() => {
+                            item.classList.remove('hidden');
+                            requestAnimationFrame(() => {
+                                item.classList.add('visible');
+                            });
+                        }, delay);
+                        delay += 50;
+                    }
+                });
+            } catch (error) {
+                console.error('搜索出错:', error);
+            }
+        }
+
+        // 创建防抖版本的搜索函数
+        const debouncedFilterItems = debounce(filterItems, 300);
+
+        // 添加搜索输入监听
+        document.querySelector('.search-input').addEventListener('input', function(e) {
+            debouncedFilterItems(e.target.value);
+        });
+
+        // 页面加载完成初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 观察搜索框
+            const searchContainer = document.querySelector('.search-container');
+            observer.observe(searchContainer);
+
+            // 观察数据卡片
+            const items = document.querySelectorAll('.item');
+            items.forEach(item => {
+                observer.observe(item);
+                
+                // 点击事件处理
+                const url = item.getAttribute('data-url');
+                if (url) {
+                    item.addEventListener('click', () => {
+                        saveState();  // 保存状态并标记为详情页跳转
+                        window.location.href = url;
+                    });
+                }
+            });
+
+            // 初始化搜索框事件监听
+            const searchInput = document.querySelector('.search-input');
+            if (searchInput) {
+                const debouncedSearch = debounce(filterItems, 150);
+                searchInput.addEventListener('input', (e) => {
+                    debouncedSearch(e.target.value);
+                });
+            }
+
+            // 状态恢复逻辑
+            if (document.referrer.includes('/data/')) {
+                restoreState();
+            } else {
+                // 清空搜索框
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                // 清除状态
+                localStorage.removeItem('pageState');
+            }
+        });
+
+        // 修改页面刷新监听
+        window.addEventListener('beforeunload', (event) => {
+            const state = JSON.parse(localStorage.getItem('pageState') || '{}');
+            // 如果是从详情页相关的状态，则清除
+            if (!state.fromDetail) {
+                localStorage.removeItem('pageState');
+            }
+        });
+
+        // 修改页面可见性变化监听
+        document.addEventListener('visibilitychange', () => {
+            // 只在从其他页面返回且不是从详情页返回清除状态
+            if (document.visibilityState === 'visible' && 
+                document.referrer && 
+                !document.referrer.includes('/data/') && 
+                !document.referrer.includes(window.location.host)) {
+                localStorage.removeItem('pageState');
+            }
+        });
+
+        // 添加滚动处理
+        const header = document.querySelector('.header');
+        const body = document.body;
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                header.classList.add('sticky');
+                body.classList.add('sticky-active');
+            } else {
+                header.classList.remove('sticky');
+                body.classList.remove('sticky-active');
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        // 图片预览相关函数
+        function openPreviewModal(img) {
+            // 创建预览模态框
+            let modal = document.getElementById('previewModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'previewModal';
+                modal.className = 'preview-modal';
+                modal.innerHTML = `
+                    <div class="preview-content">
+                        <img id="previewImage" src="" alt="预览图片">
+                    </div>
+                    <div class="close-preview" onclick="closePreviewModal()"></div>
+                `;
+                document.body.appendChild(modal);
+
+                // 点击模态框背景关闭
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        closePreviewModal();
+                    }
+                });
+            }
+
+            const previewImage = modal.querySelector('#previewImage');
+            previewImage.src = img.src;
+            
+            modal.style.display = 'block';
+            void modal.offsetWidth;
+            modal.classList.add('show');
+        }
+
+        function closePreviewModal() {
+            const modal = document.getElementById('previewModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // ESC键关闭预览
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closePreviewModal();
+            }
+        });
+
+        // 处理字段值入框的输入事件
+        function handleValueInput(input) {
+            const wrapper = input.closest('.field-value-wrapper');
+            const uploadBtn = wrapper.querySelector('.upload-btn');
+            const preview = wrapper.querySelector('.image-preview');
+            
+            if (input.value.trim()) {
+                uploadBtn.classList.add('hidden');
+            } else {
+                // 只有当没有预览图片时才显示上传按钮
+                if (!preview.classList.contains('visible')) {
+                    uploadBtn.classList.remove('hidden');
+                }
+            }
+        }
+
+        function triggerImageUpload(button) {
+            const fileInput = button.parentElement.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.click();
+            }
+        }
+
+        // 存储上传但未保存的图片路径
+        let uploadedImages = new Set();
+
+        // 删除未保存的图片
+        async function deleteUnsavedImages() {
+            if (uploadedImages.size === 0) return;
+            
+            const promises = [];
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+            
+            for (const imagePath of uploadedImages) {
+                try {
+                    const promise = fetch('/api/delete_image', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({ path: imagePath })
+                    }).catch(error => {
+                        console.error('删除图片失败:', error);
+                    });
+                    promises.push(promise);
+                } catch (error) {
+                    console.error('创建删除请求失败:', error);
+                }
+            }
+            
+            try {
+                await Promise.all(promises);
+                uploadedImages.clear();
+            } catch (error) {
+                console.error('删除图片过程中出错:', error);
+            }
+        }
+
+        // 在页面刷新或关闭前删除未保存的图片
+        window.addEventListener('beforeunload', function(e) {
+            if (uploadedImages.size > 0) {
+                // 创建同步的XMLHttpRequest来删除图片
+                const xhr = new XMLHttpRequest();
+                const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+                
+                for (const imagePath of uploadedImages) {
+                    try {
+                        xhr.open('POST', '/api/delete_image', false); // false表示同步请求
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+                        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+                        xhr.send(JSON.stringify({ path: imagePath }));
+                    } catch (error) {
+                        console.error('删除图片失败:', error);
+                    }
+                }
+                uploadedImages.clear();
+            }
+        });
+
+        async function handleImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const wrapper = input.closest('.field-value-wrapper');
+            const preview = wrapper.querySelector('.image-preview');
+            const valueInput = wrapper.querySelector('.field-value');
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+            
+            try {
+                // 如果之前有上传的图片，先删除
+                if (wrapper.dataset.newImagePath) {
+                    try {
+                        await fetch('/api/delete_image', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken
+                            },
+                            body: JSON.stringify({ path: wrapper.dataset.newImagePath })
+                        });
+                        uploadedImages.delete(wrapper.dataset.newImagePath);
+                    } catch (error) {
+                        console.error('删除旧图片失败:', error);
+                    }
+                }
+
+                // 上传新图片
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('csrf_token', csrfToken);
+
+                const response = await fetch('/upload_image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || '图片上传失败');
+                }
+
+                const result = await response.json();
+                
+                // 保存新图片路径到value input
+                valueInput.value = result.path;
+                valueInput.setAttribute('data-original-value', result.path);
+                
+                // 显示预览
+                preview.src = result.path;
+                preview.classList.add('visible');
+                wrapper.classList.add('has-image');
+                valueInput.classList.add('hidden');
+                valueInput.removeAttribute('required');
+                
+                // 标记为已上传
+                wrapper.dataset.uploaded = 'true';
+                wrapper.dataset.newImagePath = result.path;
+                
+                // 添加到未保存图片集合
+                uploadedImages.add(result.path);
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message || '图片上传失败，请重试');
+                // 清除文件选择
+                input.value = '';
+            }
+        }
+
+        // 添加字段相关函数
+        let fieldCount = 0;
+        
+        function addField() {
+            fieldCount++;
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group field-group entering';
+            fieldDiv.innerHTML = `
+                <input type="text" class="field-key" placeholder="字段名称" required onchange="checkDuplicateField(this)" autocomplete="off">
+                <div class="field-value-wrapper">
+                    <input type="text" class="field-value" placeholder="字段值" required autocomplete="off" oninput="handleValueInput(this)">
+                    <img class="image-preview" onclick="openPreviewModal(this)">
+                    <button type="button" class="upload-btn" onclick="triggerImageUpload(this)" title="上传图片">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/>
+                        </svg>
+                    </button>
+                    <input type="file" accept="image/*" style="display: none" onchange="handleImageUpload(this)">
+                </div>
+                <button type="button" class="btn-remove" onclick="removeField(this)" title="删除字段">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            `;
+            
+            // 将预设字段添加到名称字段之后
+            const formFields = document.getElementById('formFields');
+            formFields.appendChild(fieldDiv);
+
+            // 添加过渡动画
+            requestAnimationFrame(() => {
+                fieldDiv.classList.remove('entering');
+            });
+        }
+        
+        async function removeField(button) {
+            const fieldGroup = button.closest('.field-group');
+            if (fieldGroup) {
+                // 检查是否有已上传的图片需要删除
+                const wrapper = fieldGroup.querySelector('.field-value-wrapper');
+                if (wrapper && wrapper.dataset.uploaded === 'true' && wrapper.dataset.newImagePath) {
+                    try {
+                        // 删除已上传的图片
+                        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+                        await fetch('/api/delete_image', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken
+                            },
+                            body: JSON.stringify({ path: wrapper.dataset.newImagePath })
+                        });
+                        // 从未保存图片集合中移除
+                        uploadedImages.delete(wrapper.dataset.newImagePath);
+                    } catch (error) {
+                        console.error('删除图片失败:', error);
+                    }
+                }
+
+                // 获取当前高度
+                const currentHeight = fieldGroup.offsetHeight;
+                const marginBottom = parseInt(window.getComputedStyle(fieldGroup).marginBottom);
+                
+                // 设置具体的高度和边距，以便可以渡到0
+                fieldGroup.style.height = currentHeight + 'px';
+                fieldGroup.style.marginBottom = marginBottom + 'px';
+                
+                // 触发重排
+                void fieldGroup.offsetWidth;
+                
+                // 添加删除类
+                fieldGroup.classList.add('removing');
+                
+                // 等待过渡动画完成后移除元素
+                setTimeout(() => {
+                    fieldGroup.remove();
+                }, 300);
+            }
+        }
+
+        function addPresetField(fieldName) {
+            fieldCount++;
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group field-group entering';
+            fieldDiv.innerHTML = `
+                <input type="text" class="field-key" value="${fieldName}" required onchange="checkDuplicateField(this)" autocomplete="off">
+                <div class="field-value-wrapper">
+                    <input type="text" class="field-value" placeholder="字段值" required autocomplete="off" oninput="handleValueInput(this)">
+                    <img class="image-preview" onclick="openPreviewModal(this)">
+                    <button type="button" class="upload-btn" onclick="triggerImageUpload(this)" title="上传图片">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/>
+                        </svg>
+                    </button>
+                    <input type="file" accept="image/*" style="display: none" onchange="handleImageUpload(this)">
+                </div>
+                <button type="button" class="btn-remove" onclick="removeField(this)" title="删除字段">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            `;
+            
+            // 将预设字段添加到名称字段之后
+            const formFields = document.getElementById('formFields');
+            formFields.appendChild(fieldDiv);
+
+            // 添加过渡动画
+            requestAnimationFrame(() => {
+                fieldDiv.classList.remove('entering');
+            });
+        }
+
+        function checkDuplicateField(input) {
+            const form = document.getElementById('addForm');
+            const keyInputs = form.querySelectorAll('.field-key');
+            const currentValue = input.value.trim();
+            
+            // 检查是否为空
+            if (!currentValue) {
+                return;
+            }
+
+            // 检查是否为"名称"
+            if (currentValue === "名称") {
+                input.value = '';
+                alert('不能使用"名称"作为字段名，这是系统保留字段');
+                return;
+            }
+
+            // 检查重复
+            let count = 0;
+            keyInputs.forEach(keyInput => {
+                if (keyInput.value.trim() === currentValue) {
+                    count++;
+                }
+            });
+
+            if (count > 1) {
+                input.value = '';
+                alert('字段名已存在，请使用其他名称');
+            }
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+            
+            try {
+                // 检查字段名是否重复
+                const keyInputs = form.querySelectorAll('.field-key');
+                const fieldNames = new Set();
+                let hasDuplicate = false;
+                
+                keyInputs.forEach(input => {
+                    const value = input.value.trim();
+                    if (value && fieldNames.has(value)) {
+                        hasDuplicate = true;
+                    }
+                    fieldNames.add(value);
+                });
+
+                if (hasDuplicate) {
+                    alert('存在重复的字段名，请修改后重试');
+                    return;
+                }
+
+                // 创建一个有序的数据对象
+                const data = {};
+                const fieldsOrder = [];
+                
+                // 首先添加"名称"字段
+                data["名称"] = form.querySelector('[name="名称"]').value;
+                fieldsOrder.push("名称");
+                
+                // 获取所有现有的字段组
+                const fieldGroups = form.querySelectorAll('.field-group');
+                
+                // 按序处理每个字段
+                for (const group of fieldGroups) {
+                    const keyInput = group.querySelector('.field-key');
+                    const wrapper = group.querySelector('.field-value-wrapper');
+                    const valueInput = wrapper?.querySelector('.field-value');
+                    const preview = wrapper?.querySelector('.image-preview');
+                    
+                    if (!keyInput || !wrapper) continue;
+                    
+                    const key = keyInput.value?.trim();
+                    if (!key || key === "名称") continue;
+
+                    if (wrapper.dataset.uploaded === 'true' && wrapper.dataset.newImagePath) {
+                        // 使用已上传的新图片路径
+                        data[key] = wrapper.dataset.newImagePath;
+                        fieldsOrder.push(key);
+                        // 从未保存图片集合中移除，因为现在要保存了
+                        uploadedImages.delete(wrapper.dataset.newImagePath);
+                    } else if (preview?.classList.contains('visible') && preview.src) {
+                        // 如果有显示的预览图但没有新上传的图片，说明是原有图片
+                        if (preview.src.startsWith(window.location.origin)) {
+                            // 保留原有的图片路径
+                            const imagePath = preview.src.replace(window.location.origin, '');
+                            data[key] = imagePath;
+                            fieldsOrder.push(key);
+                        }
+                    } else if (valueInput && valueInput.value.trim()) {
+                        // 处理普通文本值
+                        data[key] = valueInput.value.trim();
+                        fieldsOrder.push(key);
+                    }
+                }
+
+                const formData = new FormData();
+                formData.append('data', JSON.stringify(data));
+                formData.append('fieldsOrder', JSON.stringify(fieldsOrder));
+                formData.append('csrf_token', csrfToken);
+
+                const response = await fetch('/api/item', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status === 401) {
+                        // 会话过期，重定向到登录页面
+                        window.location.href = '/login';
+                        return;
+                    }
+                    throw new Error(errorData.error || '添加失败');
+                }
+
+                // 清空未保存图片集合，因为现在已经保存了
+                uploadedImages.clear();
+                closeModal();
+                window.location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message || '添加失败，请重试');
+            }
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('addModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // 模态框相关函数
+        function openModal() {
+            const modal = document.getElementById('addModal');
+            modal.style.display = 'block';
+            // 强制重排，确保过渡动画生效
+            void modal.offsetWidth;
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+            
+            // 重置表单
+            const form = document.getElementById('addForm');
+            form.reset();
+            const formFields = document.getElementById('formFields');
+            const nameField = formFields.querySelector('.form-group:first-child');
+            formFields.innerHTML = '';
+            formFields.appendChild(nameField);
+            fieldCount = 0;
+
+            // 确保CSRF令牌存在
+            const csrfInput = form.querySelector('input[name="csrf_token"]');
+            if (!csrfInput) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'csrf_token';
+                input.value = '{{ csrf_token }}';
+                form.insertBefore(input, form.firstChild);
+            }
+
+            // 添加预设字段（按照固定顺序）
+            const presetFields = ['账号', '密码'];
+            presetFields.forEach(field => {
+                addPresetField(field);
+            });
+        }
+
+        async function closeModal() {
+            const modal = document.getElementById('addModal');
+            
+            try {
+                // 先删除所有未保存的图片
+                await deleteUnsavedImages();
+                
+                // 然后关闭模态框
+                modal.classList.remove('show');
+                
+                // 等待动画完成后重置表单
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                modal.style.display = 'none';
+                // 重置表单
+                const form = document.getElementById('addForm');
+                form.reset();
+                const formFields = document.getElementById('formFields');
+                const nameField = formFields.querySelector('.form-group:first-child');
+                formFields.innerHTML = '';
+                formFields.appendChild(nameField);
+                fieldCount = 0;
+            } catch (error) {
+                console.error('关闭模态框时出错:', error);
+                // 即使出错也要关闭模态框
+                modal.style.display = 'none';
+            }
+        }
+
+        async function cleanupImages() {
+            // 保留函数但不执行任何操作，以防其他代码调用
+            return;
+        }
+    </script>
+</body>
+</html>

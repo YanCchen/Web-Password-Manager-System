@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X</title>
+    <link rel="icon" href="https://q.qlogo.cn/headimg_dl?dst_uin=43891963&spec=640&img_type=png" sizes="192x192" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #6C63FF, #2A2A72);
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            position: relative;
+            cursor: none;
+        }
+
+        /* 在可点击元素上显示指针样式 */
+        button,
+        input,
+        .login-container {
+            cursor: none !important;
+        }
+
+        /* 添加动态背景 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                rgba(108, 99, 255, 0.1) 0%,
+                rgba(42, 42, 114, 0.1) 25%,
+                rgba(108, 99, 255, 0.1) 50%,
+                rgba(42, 42, 114, 0.1) 75%,
+                rgba(108, 99, 255, 0.1) 100%
+            );
+            animation: gradientMove 15s linear infinite;
+            transform-origin: center;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        /* 添加浮动粒子 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: particleFloat 20s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100vw);
+                opacity: 0;
+            }
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            height: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1;
+        }
+
+        .login-container:hover,
+        .login-container:focus-within {
+            max-width: 400px;
+            height: 250px;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-container:hover .inspiration,
+        .login-container:focus-within .inspiration {
+            opacity: 0;
+            transform: translate(-50%, -70%);
+        }
+
+        .login-form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateY(20px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .login-container:hover .login-form,
+        .login-container:focus-within .login-form {
+            transform: translate(-50%, -50%) translateY(0);
+            opacity: 1;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 添加光晕效果 */
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 70%
+            );
+            animation: rotateLightEffect 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotateLightEffect {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .inspiration {
+            font-size: 1.2rem;
+            color: #2C3E50;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 1;
+            white-space: nowrap;
+            animation: fadeIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 添加文字发光效果 */
+        .inspiration::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            filter: blur(8px);
+            animation: textGlow 2s ease-in-out infinite alternate;
+            background: linear-gradient(45deg, #6C63FF, #2A2A72);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes textGlow {
+            0% {
+                opacity: 0;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+        }
+
+        .login-form input {
+            width: 80%;
+            padding: 12px;
+            margin: 5px 0;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 添加输入框动画效果 */
+        .login-form input::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(108, 99, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #6C63FF;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+            transform: translateY(-2px) scale(1.02);
+            animation: inputPulse 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes inputPulse {
+            0% {
+                box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 5px 20px rgba(108, 99, 255, 0.4);
+            }
+            100% {
+                box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            animation: toastShake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        @keyframes toastShake {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-52%) translateY(0) rotate(-1deg);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(-48%) translateY(0) rotate(1deg);
+            }
+        }
+
+        /* 保持登录按钮的原有样式 */
+        .login-form button {
+            width: 80%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6C63FF 0%, #2A2A72 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: none !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            transform-origin: center;
+            box-shadow: 0 2px 10px rgba(108, 99, 255, 0.2);
+            outline: none;
+        }
+        
+        .login-form button:focus-visible {
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #6C63FF;
+            transform: translateY(-2px);
+        }
+        
+        .login-form button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+        
+        .login-form button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 5px 20px rgba(108, 99, 255, 0.4);
+            background: linear-gradient(135deg, #7A74FF 0%, #3E3E8F 100%);
+        }
+        
+        .login-form button:hover::before {
+            left: 100%;
+        }
+        
+        .login-form button:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 2px 10px rgba(108, 99, 255, 0.3);
+            background: linear-gradient(135deg, #5B54FF 0%, #1E1E5F 100%);
+        }
+        
+        .login-form button.loading {
+            pointer-events: none;
+            opacity: 0.8;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* 添加鼠标跟随效果 */
+        .cursor-effect {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(108, 99, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, opacity 0.3s;
+            z-index: 9999;
+            opacity: 0;  /* 初始状态设为不可见 */
+        }
+
+        .cursor-effect.active {
+            width: 40px;
+            height: 40px;
+            border-color: rgba(108, 99, 255, 0.8);
+        }
+
+        /* 手机端适配 */
+        @media (max-width: 768px) {
+            body {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: -webkit-fill-available;
+            }
+
+            .login-container {
+                width: 85%;
+                max-width: 320px;
+                padding: 20px;
+                margin: 0;
+                height: 30px;
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .login-form {
+                width: 100%;
+                padding: 10px;
+                box-sizing: border-box;
+                opacity: 0;
+                visibility: hidden;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                transition: all 0.3s ease;
+                pointer-events: none;
+                display: none;
+            }
+
+            .inspiration {
+                font-size: 1rem;
+                width: 100%;
+                padding: 0 10px;
+                box-sizing: border-box;
+                white-space: normal;
+                line-height: 1.4;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                margin: 0;
+                opacity: 1;
+                transition: all 0.3s ease;
+            }
+
+            .login-container.expanded {
+                height: 250px !important;
+            }
+
+            .login-container.expanded .inspiration {
+                opacity: 0 !important;
+                transform: translate(-50%, -150%) !important;
+                visibility: hidden;
+            }
+
+            .login-container.expanded .login-form {
+                opacity: 1 !important;
+                transform: translate(-50%, -50%) !important;
+                pointer-events: auto !important;
+                visibility: visible;
+                display: flex;
+            }
+
+            .login-form input,
+            .login-form button {
+                width: 100%;
+                max-width: 280px;
+                font-size: 15px;
+                padding: 12px 15px;
+                border-radius: 12px;
+                margin: 8px auto;
+                box-sizing: border-box;
+            }
+
+            .toast {
+                position: fixed;
+                bottom: 30px !important;
+                top: auto !important;
+                left: 50%;
+                transform: translateX(-50%) translateY(100px) !important;
+                padding: 12px 20px;
+                font-size: 15px;
+                border-radius: 25px;
+                background: rgba(244, 67, 54, 0.95);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                white-space: normal;
+                word-break: break-word;
+                width: auto;
+                min-width: auto;
+                max-width: 85%;
+                z-index: 10000;
+                margin: 0;
+                transition: opacity 0.3s ease, transform 0.3s ease !important;
+            }
+
+            .toast.show {
+                transform: translateX(-50%) translateY(0) !important;
+                opacity: 1;
+                animation: toastShakeMobile 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            }
+
+            .toast.hide {
+                transform: translateX(-50%) translateY(0) !important;
+                opacity: 0;
+            }
+
+            @keyframes toastShakeMobile {
+                0%, 100% {
+                    transform: translateX(-50%) translateY(0) !important;
+                }
+                10%, 30%, 50%, 70%, 90% {
+                    transform: translateX(-53%) translateY(0) !important;
+                }
+                20%, 40%, 60%, 80% {
+                    transform: translateX(-47%) translateY(0) !important;
+                }
+            }
+
+            /* 隐藏鼠标效果 */
+            .cursor-effect {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles"></div>
+    <div class="cursor-effect"></div>
+    <div class="login-container">
+        <div class="inspiration" data-text="「 过好今天，期待明天 」">"「 过好今天，期待明天 」"</div>
+        <div class="login-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="text" placeholder="用户名" id="username" autocomplete="off">
+            <input type="password" placeholder="密码" id="password" autocomplete="off">
+            <button onclick="login()">登录</button>
+        </div>
+    </div>
+    <div id="toast" class="toast">登录失败，请重试。</div>
+    <script>
+        // 添加粒子效果
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // 随机位置和延迟
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.opacity = Math.random() * 0.5;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 添加鼠标跟随效果
+        function initCursorEffect() {
+            const cursor = document.querySelector('.cursor-effect');
+            let isFirstMove = true;
+
+            document.addEventListener('mousemove', (e) => {
+                // 第一次移动时添加过渡动画
+                if (isFirstMove) {
+                    cursor.style.transition = 'width 0.2s, height 0.2s, opacity 0.3s';
+                    isFirstMove = false;
+                }
+                
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                cursor.style.opacity = '1';
+            });
+
+            document.addEventListener('mousedown', () => {
+                cursor.classList.add('active');
+            });
+
+            document.addEventListener('mouseup', () => {
+                cursor.classList.remove('active');
+            });
+
+            document.addEventListener('mouseleave', () => {
+                cursor.style.opacity = '0';
+            });
+
+            document.addEventListener('mouseenter', () => {
+                if (!isFirstMove) {
+                    cursor.style.opacity = '1';
+                }
+            });
+        }
+
+        // 重写移动端交互脚本
+        function initMobileInteraction() {
+            if (window.innerWidth > 768) return;  // 仅在移动端执行
+            
+            const container = document.querySelector('.login-container');
+            const loginForm = document.querySelector('.login-form');
+            const inspiration = document.querySelector('.inspiration');
+            
+            // 添加点击事件
+            container.addEventListener('click', function(e) {
+                // 如果点击的是表单内的元素，不处理
+                if (e.target.closest('.login-form')) {
+                    e.stopPropagation();
+                    return;
+                }
+                
+                // 切换展开状态
+                this.classList.toggle('expanded');
+                e.stopPropagation();
+            });
+            
+            // 阻止表单点击事件冒泡
+            loginForm.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // 阻止输入框的点击事件冒泡
+            const inputs = container.querySelectorAll('.login-form input');
+            inputs.forEach(input => {
+                input.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+                input.addEventListener('focus', function(e) {
+                    e.stopPropagation();
+                });
+                
+                input.addEventListener('keydown', function(event) {
+                    event.stopPropagation();
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        login();
+                    }
+                });
+            });
+
+            // 阻止按钮的点击事件冒泡
+            const button = container.querySelector('.login-form button');
+            if (button) {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+            
+            // 点击其他区域关闭
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.login-container')) {
+                    container.classList.remove('expanded');
+                }
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.login-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+
+            // 创建粒子
+            createParticles();
+            // 初始化鼠标跟随效果
+            initCursorEffect();
+            // 初始化移动端交互
+            if (window.innerWidth <= 768) {
+                initMobileInteraction();
+            }
+        });
+        
+        // 修改错误提示的显示和隐藏逻辑
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            // 移除之前的类
+            toast.classList.remove('hide');
+            // 添加显示类
+            toast.classList.add('show');
+            
+            // 设置定时器
+            setTimeout(() => {
+                // 添加隐藏类
+                toast.classList.add('hide');
+                // 等待动画完成后移除类
+                setTimeout(() => {
+                    toast.classList.remove('show', 'hide');
+                }, 300);
+            }, duration);
+        }
+
+        // 修改登录函数中的错误提示调用
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+            const button = document.querySelector('.login-form button');
+            
+            button.classList.add('loading');
+            button.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('password', password);
+            formData.append('csrf_token', csrfToken);
+            
+            fetch('/login', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.status === 403) {
+                    throw new Error('请稍后再试☹️');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    showToast(data.error);
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                } else if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast(error.message || '登录失败，请重试☹️');
+                button.classList.remove('loading');
+                button.disabled = false;
+            });
+        }
+        
+        // 添加输入框聚焦效果
+        const inputs = document.querySelectorAll('.login-form input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.transform = '';
+            });
+
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    login();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
