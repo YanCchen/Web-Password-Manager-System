@@ -71,7 +71,7 @@
        MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # Max 16MB
    ```
 
-### 🪟 Windows Environment
+### 💻Windows Environment
 
 1. **Prerequisites**
    - Install Python 3.8 or higher
@@ -375,4 +375,4 @@ class Config:
 ---
 
 ## 📄 License
-MIT License 🎉 
+MIT License 🎉 <u></u>
