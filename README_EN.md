@@ -8,6 +8,7 @@
 
 ## 📚 Table of Contents
 - [Features](#-features)
+- [Technology Stack](#️-technology-stack)
 - [Quick Start](#-quick-start)
 - [Configuration](#️-configuration)
 - [User Guide](#-user-guide)
@@ -44,6 +45,40 @@
 - Python 3.8+
 - Modern Browsers (Chrome/Firefox/Safari/Edge)
 - Cross-platform (Windows/Linux/MacOS)
+
+---
+
+## 📥️ Technology Stack
+
+### 🔧 Backend
+- Python 3.8+
+- Flask Framework
+- Werkzeug WSGI Toolkit
+- OpenSSL (HTTPS Support)
+- Waitress/Gunicorn (Production WSGI Server)
+- Gevent (Async Processing)
+
+### 🔒 Security
+- SHA-256 Password Hashing
+- CSRF Protection
+- XSS Protection
+- Session Management
+- Rate Limiting
+- HTTPS Encryption
+- CSP Security Policy
+
+### 💾 Storage
+- JSON File Storage
+- Filesystem Image Storage
+- Flask-Session Management
+
+### 🎨 Frontend
+- Native JavaScript
+- CSS3 Animations
+- Flex Layout
+- Responsive Design
+- AJAX Requests
+- Real-time Search
 
 ---
 

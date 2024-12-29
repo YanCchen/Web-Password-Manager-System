@@ -8,6 +8,7 @@
 
 ## 📚 目录
 - [功能特点](#-功能特点)
+- [技术栈](#️-技术栈)
 - [快速开始](#-快速开始)
 - [配置说明](#️-配置说明)
 - [使用指南](#-使用指南)
@@ -44,6 +45,40 @@
 - Python 3.8+
 - 主流浏览器（Chrome/Firefox/Safari/Edge）
 - 全平台支持（Windows/Linux/MacOS）
+
+---
+
+## 📥️ 技术栈
+
+### 🔧 后端技术
+- Python 3.8+
+- Flask 框架
+- Werkzeug WSGI工具库
+- OpenSSL (HTTPS支持)
+- Waitress/Gunicorn (生产环境WSGI服务器)
+- Gevent (异步处理)
+
+### 🔒 安全技术
+- SHA-256 密码哈希
+- CSRF 防护
+- XSS 防护
+- 会话管理
+- 速率限制
+- HTTPS加密传输
+- CSP安全策略
+
+### 💾 数据存储
+- JSON文件存储
+- 文件系统图片存储
+- Flask-Session会话管理
+
+### 🎨 前端技术
+- 原生JavaScript
+- CSS3 动画
+- Flex布局
+- 响应式设计
+- AJAX异步请求
+- 实时搜索
 
 ---
 
